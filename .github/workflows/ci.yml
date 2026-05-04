@@ -57,7 +57,7 @@ jobs:
           cd services/payment && npm audit --json > ../../payment-audit.json || true
 
       - name: Run Gitleaks secret scan
-        uses: zricethezav/gitleaks-action@v4
+        uses: gitleaks/gitleaks-action@v2
         with:
           config_path: .gitleaks.toml
           args: '--redact'
