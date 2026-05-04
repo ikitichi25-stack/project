@@ -1,0 +1,117 @@
+{
+  "issues": [
+    {
+      "id": "CKV_DOCKER_17",
+      "name": "Resource limits not set",
+      "file": "docker-compose.yml",
+      "severity": "MEDIUM",
+      "recommendation": "Add memory/cpu limits to services"
+    },
+    {
+      "id": "CKV_DOCKER_16",
+      "name": "Restart policy not configured",
+      "file": "docker-compose.yml",
+      "severity": "LOW",
+      "recommendation": "Add restart_policy: unless-stopped"
+    },
+    {
+      "id": "CKV_DOCKER_4",
+      "name": "User not explicitly set (running as root)",
+      "file": "api-gateway\\Dockerfile",
+      "severity": "HIGH",
+      "recommendation": "Add USER appuser directive before CMD"
+    },
+    {
+      "id": "CKV_DOCKER_35",
+      "name": "HEALTHCHECK not defined",
+      "file": "api-gateway\\Dockerfile",
+      "severity": "LOW",
+      "recommendation": "Add HEALTHCHECK instruction"
+    },
+    {
+      "id": "CKV_DOCKER_4",
+      "name": "User not explicitly set (running as root)",
+      "file": "services\\inventory\\Dockerfile",
+      "severity": "HIGH",
+      "recommendation": "Add USER appuser directive before CMD"
+    },
+    {
+      "id": "CKV_DOCKER_35",
+      "name": "HEALTHCHECK not defined",
+      "file": "services\\inventory\\Dockerfile",
+      "severity": "LOW",
+      "recommendation": "Add HEALTHCHECK instruction"
+    },
+    {
+      "id": "CKV_DOCKER_4",
+      "name": "User not explicitly set (running as root)",
+      "file": "services\\notification\\Dockerfile",
+      "severity": "HIGH",
+      "recommendation": "Add USER appuser directive before CMD"
+    },
+    {
+      "id": "CKV_DOCKER_35",
+      "name": "HEALTHCHECK not defined",
+      "file": "services\\notification\\Dockerfile",
+      "severity": "LOW",
+      "recommendation": "Add HEALTHCHECK instruction"
+    },
+    {
+      "id": "CKV_DOCKER_4",
+      "name": "User not explicitly set (running as root)",
+      "file": "services\\order\\Dockerfile",
+      "severity": "HIGH",
+      "recommendation": "Add USER appuser directive before CMD"
+    },
+    {
+      "id": "CKV_DOCKER_35",
+      "name": "HEALTHCHECK not defined",
+      "file": "services\\order\\Dockerfile",
+      "severity": "LOW",
+      "recommendation": "Add HEALTHCHECK instruction"
+    },
+    {
+      "id": "CKV_DOCKER_4",
+      "name": "User not explicitly set (running as root)",
+      "file": "services\\payment\\Dockerfile",
+      "severity": "HIGH",
+      "recommendation": "Add USER appuser directive before CMD"
+    },
+    {
+      "id": "CKV_DOCKER_35",
+      "name": "HEALTHCHECK not defined",
+      "file": "services\\payment\\Dockerfile",
+      "severity": "LOW",
+      "recommendation": "Add HEALTHCHECK instruction"
+    },
+    {
+      "id": "CKV_DOCKER_4",
+      "name": "User not explicitly set (running as root)",
+      "file": "services\\product\\Dockerfile",
+      "severity": "HIGH",
+      "recommendation": "Add USER appuser directive before CMD"
+    },
+    {
+      "id": "CKV_DOCKER_35",
+      "name": "HEALTHCHECK not defined",
+      "file": "services\\product\\Dockerfile",
+      "severity": "LOW",
+      "recommendation": "Add HEALTHCHECK instruction"
+    },
+    {
+      "id": "CKV_DOCKER_4",
+      "name": "User not explicitly set (running as root)",
+      "file": "services\\user\\Dockerfile",
+      "severity": "HIGH",
+      "recommendation": "Add USER appuser directive before CMD"
+    },
+    {
+      "id": "CKV_DOCKER_35",
+      "name": "HEALTHCHECK not defined",
+      "file": "services\\user\\Dockerfile",
+      "severity": "LOW",
+      "recommendation": "Add HEALTHCHECK instruction"
+    }
+  ],
+  "total": 16
+}

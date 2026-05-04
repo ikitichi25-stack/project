@@ -1,0 +1,80 @@
+version: '3.9'
+
+services:
+  vault:
+    image: vault:latest
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=dev-token-local
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+    ports:
+      - '8200:8200'
+    cap_add:
+      - IPC_LOCK
+    healthcheck:
+      test: ['CMD', 'vault', 'status']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - securedshop
+
+  api-gateway:
+    image: secureshop_api-gateway:latest
+    build: ./api-gateway
+    ports:
+      - '8080:80'
+    depends_on:
+      - user
+      - product
+      - order
+      - payment
+      - notification
+      - inventory
+    networks:
+      - securedshop
+
+  user:
+    image: secureshop_user:latest
+    build: ./services/user
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - securedshop
+
+  product:
+    image: secureshop_product:latest
+    build: ./services/product
+    networks:
+      - securedshop
+
+  order:
+    image: secureshop_order:latest
+    build: ./services/order
+    environment:
+      - NOTIFICATION_URL=http://notification:8005
+      - INVENTORY_URL=http://inventory:8006
+      - PRODUCT_URL=http://product:8002
+    networks:
+      - securedshop
+
+  payment:
+    image: secureshop_payment:latest
+    build: ./services/payment
+    networks:
+      - securedshop
+
+  notification:
+    image: secureshop_notification:latest
+    build: ./services/notification
+    networks:
+      - securedshop
+
+  inventory:
+    image: secureshop_inventory:latest
+    build: ./services/inventory
+    networks:
+      - securedshop
+
+networks:
+  securedshop:
+    driver: bridge

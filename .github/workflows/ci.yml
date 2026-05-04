@@ -1,0 +1,87 @@
+name: SecureShop DevSecOps CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Install Python security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install semgrep bandit pip-audit checkov
+
+      - name: Install Node service dependencies
+        run: |
+          cd services/product && npm install
+          cd ../payment && npm install
+
+      - name: Run Bandit on Python services
+        run: |
+          bandit -r services/user services/order services/notification services/inventory -f json -o bandit-report.json
+
+      - name: Run Semgrep SAST scan
+        run: |
+          semgrep --config=p/ci --sarif --output semgrep-report.sarif .
+
+      - name: Upload Semgrep SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-report.sarif
+
+      - name: Run pip-audit for Python SCA
+        run: |
+          pip-audit --format json --output pip-audit-report.json
+
+      - name: Run npm audit for JavaScript SCA
+        run: |
+          cd services/product && npm audit --json > ../../product-audit.json || true
+          cd services/payment && npm audit --json > ../../payment-audit.json || true
+
+      - name: Run Gitleaks secret scan
+        uses: zricethezav/gitleaks-action@v4
+        with:
+          config_path: .gitleaks.toml
+          args: '--redact'
+
+      - name: Build Docker Compose images
+        run: |
+          docker compose build
+
+      - name: Run Trivy container scan
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --security-checks vuln --format table secureshop_api-gateway:latest || true
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --security-checks vuln --format table secureshop_user:latest || true
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --security-checks vuln --format table secureshop_product:latest || true
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --security-checks vuln --format table secureshop_order:latest || true
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --security-checks vuln --format table secureshop_payment:latest || true
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --security-checks vuln --format table secureshop_notification:latest || true
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image --security-checks vuln --format table secureshop_inventory:latest || true
+
+      - name: Run Checkov IaC scan
+        run: |
+          checkov -f docker-compose.yml -o json --output-file checkov-report.json
+
+      - name: Run DAST with OWASP ZAP
+        run: |
+          docker compose up -d
+          docker run --rm --network host owasp/zap2docker-stable zap-baseline.py -t http://127.0.0.1:8080 -r zap-report.html || true
+          docker compose down
